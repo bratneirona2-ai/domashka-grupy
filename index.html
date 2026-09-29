@@ -45,8 +45,9 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
 .kicker{color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:900}.spacer-8{height:8px}.spacer-16{height:16px}
 .file-progress{font-size:12px;color:var(--muted);margin-top:6px}
 
-@media(max-width:1080px){.subject-grid{grid-template-columns:repeat(2,1fr)}.hero,.grid-2,.score-wrap,.subject-layout{grid-template-columns:1fr}}
-@media(max-width:760px){.app-shell{grid-template-columns:1fr}.sidebar{position:fixed;left:-290px;width:270px;transition:left .2s;box-shadow:30px 0 50px rgba(0,0,0,.18)}.sidebar.open{left:0}.menu-btn{display:grid;place-items:center}.topbar{padding:0 14px;height:78px}.topbar h1{font-size:19px}.topbar p{display:none}.content{padding:16px}.hero{padding:20px}.hero h2{font-size:25px}.subject-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full-span{grid-column:auto}.task-row{grid-template-columns:auto 1fr}.task-actions{grid-column:2}.info-row{grid-template-columns:1fr;gap:4px}.subject-hero{flex-direction:column}.subject-layout{grid-template-columns:1fr}.subject-tabs-row{align-items:flex-start;flex-wrap:wrap}.subject-tabs-row .tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;width:100%}.subject-tabs-row .tab{white-space:nowrap}.subject-tabs-admin{width:100%}.tab-config{grid-template-columns:1fr}}
+.schedule-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:18px}.schedule-head h2{margin:0 0 5px;font-size:26px}.week-switch{display:flex;background:#eef0f6;border-radius:12px;padding:4px;gap:4px}.week-btn{border:0;background:transparent;border-radius:9px;padding:10px 16px;font-weight:800;color:#374151}.week-btn.active{background:#fff;box-shadow:0 2px 8px rgba(17,24,39,.08);color:#111827}.schedule-board{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:auto;box-shadow:0 5px 18px rgba(17,24,39,.04)}.schedule-grid{min-width:1220px;display:grid;grid-template-columns:88px repeat(6,minmax(180px,1fr));align-items:stretch}.schedule-corner,.schedule-day{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line)}.schedule-corner{left:0;z-index:3}.schedule-day{padding:20px 10px;text-align:center;font-weight:900;color:#12366b}.schedule-time{position:sticky;left:0;z-index:1;background:#fff;border-right:1px solid var(--line);border-bottom:1px dashed #cbd5e1;padding:16px 10px;text-align:center}.schedule-time strong{display:inline-block;background:#0879bd;color:#fff;border-radius:999px;padding:7px 10px;font-size:13px}.schedule-time small{display:block;color:var(--muted);margin-top:6px}.schedule-cell{min-height:150px;padding:10px;border-right:1px solid #eef0f4;border-bottom:1px dashed #cbd5e1;position:relative;background:#fff}.schedule-cell:nth-child(14n+3),.schedule-cell:nth-child(14n+5),.schedule-cell:nth-child(14n+7){background:#fafbff}.schedule-add{position:absolute;right:8px;bottom:8px;width:30px;height:30px;border:1px dashed #b9c2d2;background:#fff;border-radius:9px;color:#64748b;font-weight:900;opacity:.35}.schedule-cell:hover .schedule-add{opacity:1}.schedule-card{position:relative;border:1px solid #dbe1ec;border-radius:14px;padding:12px;background:#fff;box-shadow:0 2px 7px rgba(17,24,39,.04);margin-bottom:8px}.schedule-card:last-child{margin-bottom:0}.schedule-card.lecture{--type:#8b93ff}.schedule-card.practice{--type:#ff6e8d}.schedule-card.lab{--type:#f3a56f}.schedule-card.seminar{--type:#55a9e8}.schedule-type{display:inline-flex;background:var(--type);color:#fff;border-radius:7px;padding:4px 8px;font-size:11px;font-weight:900;margin-bottom:9px}.schedule-card h4{margin:0 28px 8px 0;font-size:13px;color:#0f2f60;line-height:1.35}.schedule-meta{display:grid;gap:5px;color:#40536f;font-size:11px;line-height:1.35}.schedule-edit{position:absolute;right:8px;top:8px;border:0;background:#f4f6fb;border-radius:8px;width:27px;height:27px;font-weight:900;color:#475569}.teacher-preview{padding:12px 14px;border:1px solid var(--line);background:#f8fafc;border-radius:11px;color:#334155;font-size:13px}.schedule-note{margin-top:7px;color:#64748b;font-size:11px;white-space:pre-wrap}
+@media(max-width:1080px){.subject-grid{grid-template-columns:repeat(2,1fr)}.hero,.grid-2,.score-wrap,.subject-layout{grid-template-columns:1fr}.schedule-head{align-items:flex-start;flex-direction:column}}
+@media(max-width:760px){.app-shell{grid-template-columns:1fr}.sidebar{position:fixed;left:-290px;width:270px;transition:left .2s;box-shadow:30px 0 50px rgba(0,0,0,.18)}.sidebar.open{left:0}.menu-btn{display:grid;place-items:center}.topbar{padding:0 14px;height:78px}.topbar h1{font-size:19px}.topbar p{display:none}.content{padding:16px}.hero{padding:20px}.hero h2{font-size:25px}.subject-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full-span{grid-column:auto}.task-row{grid-template-columns:auto 1fr}.task-actions{grid-column:2}.info-row{grid-template-columns:1fr;gap:4px}.subject-hero{flex-direction:column}.subject-layout{grid-template-columns:1fr}.subject-tabs-row{align-items:flex-start;flex-wrap:wrap}.subject-tabs-row .tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;width:100%}.subject-tabs-row .tab{white-space:nowrap}.subject-tabs-admin{width:100%}.tab-config{grid-template-columns:1fr}.week-switch{width:100%}.week-btn{flex:1;padding:10px 8px}.schedule-head{margin-bottom:12px}}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0/dist/umd/supabase.js"></script>
 </head>
@@ -102,7 +103,8 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
 
       <nav class="main-nav" id="mainNav">
         <button class="nav-item active" data-view="home"><span>⌂</span><span>Головна</span></button>
-        <button class="nav-item" data-view="diary"><span>▦</span><span>Щоденник</span></button>
+        <button class="nav-item" data-view="schedule"><span>▦</span><span>Розклад</span></button>
+        <button class="nav-item" data-view="diary"><span>✓</span><span>Щоденник</span></button>
         <button class="nav-item" data-view="subjects"><span>▤</span><span>Предмети</span></button>
         <button class="nav-item" data-view="changes"><span>↻</span><span>Зміни</span></button>
       </nav>
@@ -113,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 9 · єдина БД</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 10 · розклад + realtime</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -150,8 +152,8 @@ const DEFAULT_CONFIG = Object.freeze({
 let db = null;
 let session = null;
 let authMode = "login";
-let state = {subjects:[], tasks:[], statuses:new Map(), changes:[], scoreStates:new Map()};
-let ui = {view:"home", selectedSubjectId:null, subjectTab:"overview", diaryFilter:"all"};
+let state = {subjects:[], tasks:[], statuses:new Map(), changes:[], scoreStates:new Map(), schedule:[]};
+let ui = {view:"home", selectedSubjectId:null, subjectTab:"overview", diaryFilter:"all", scheduleWeek:1};
 let realtimeChannel = null;
 let realtimeRefreshTimer = null;
 let realtimeBusy = false;
@@ -168,6 +170,21 @@ const SUBJECT_TABS=[
 ];
 const DEFAULT_SUBJECT_TABS=SUBJECT_TABS.map(x=>x.key);
 const TASK_TAB_KEYS=["lab","practice","test"];
+const SCHEDULE_DAYS=[
+  {id:1,label:"Понеділок"},{id:2,label:"Вівторок"},{id:3,label:"Середа"},
+  {id:4,label:"Четвер"},{id:5,label:"П'ятниця"},{id:6,label:"Субота"}
+];
+const SCHEDULE_SLOTS=[
+  {id:1,start:"08:30",end:"10:05"},{id:2,start:"10:25",end:"12:00"},
+  {id:3,start:"12:20",end:"13:55"},{id:4,start:"14:15",end:"15:50"},
+  {id:5,start:"16:10",end:"17:45"},{id:6,start:"18:30",end:"20:05"}
+];
+const CLASS_TYPES={
+  lecture:{label:"Лекція",css:"lecture"},
+  practice:{label:"Практика",css:"practice"},
+  lab:{label:"Лабораторна",css:"lab"},
+  seminar:{label:"Семінар",css:"seminar"}
+};
 
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -246,6 +263,7 @@ function bindStatic(){
   $("#modalBackdrop").onclick=e=>{if(e.target.id==="modalBackdrop")closeModal()};
   $("#quickAddBtn").onclick=()=>{
     if(!isAdmin())return toast("Недостатньо прав");
+    if(!ui.selectedSubjectId&&ui.view==="schedule")return openScheduleForm(null,{week_no:ui.scheduleWeek});
     const subject=ui.selectedSubjectId?subjectById(ui.selectedSubjectId):null;
     const enabled=subject?enabledTaskTypes(subject):[];
     const preferred=subject&&TASK_TAB_KEYS.includes(ui.subjectTab)&&enabled.includes(ui.subjectTab)?ui.subjectTab:enabled[0];
@@ -265,10 +283,17 @@ function syncPermissionsUI(){
   $("#adminBtn")?.classList.toggle("hidden",!admin);
   $("#quickAddBtn")?.classList.toggle("hidden",!admin);
   if(admin && $("#quickAddBtn")){
-    const selected=ui.selectedSubjectId?subjectById(ui.selectedSubjectId):null;
-    const hasTaskTarget=selected?enabledTaskTypes(selected).length>0:state.subjects.some(s=>enabledTaskTypes(s).length>0);
-    $("#quickAddBtn").disabled=!hasTaskTarget;
-    $("#quickAddBtn").title=hasTaskTarget?"Додати спільне ДЗ":"Увімкни для предмету Лабораторні, Практичні або Тести";
+    const scheduleMode=!ui.selectedSubjectId&&ui.view==="schedule";
+    $("#quickAddBtn").textContent=scheduleMode?"＋ Додати пару":"＋ Додати ДЗ";
+    if(scheduleMode){
+      $("#quickAddBtn").disabled=!state.subjects.length;
+      $("#quickAddBtn").title=state.subjects.length?"Додати пару в розклад":"Спочатку додай предмет";
+    }else{
+      const selected=ui.selectedSubjectId?subjectById(ui.selectedSubjectId):null;
+      const hasTaskTarget=selected?enabledTaskTypes(selected).length>0:state.subjects.some(s=>enabledTaskTypes(s).length>0);
+      $("#quickAddBtn").disabled=!hasTaskTarget;
+      $("#quickAddBtn").title=hasTaskTarget?"Додати спільне ДЗ":"Увімкни для предмету Лабораторні, Практичні або Тести";
+    }
   }
 }
 function showOnly(id){["bootScreen","setupScreen","authScreen","appShell"].forEach(x=>$("#"+x).classList.toggle("hidden",x!==id))}
@@ -403,6 +428,7 @@ function startRealtimeSync(){
     .on("postgres_changes",{event:"*",schema:"public",table:"changes"},()=>scheduleFullRefresh())
     .on("postgres_changes",{event:"*",schema:"public",table:"task_status",filter:`user_id=eq.${uid}`},()=>scheduleFullRefresh())
     .on("postgres_changes",{event:"*",schema:"public",table:"subject_score_status",filter:`user_id=eq.${uid}`},()=>scheduleFullRefresh())
+    .on("postgres_changes",{event:"*",schema:"public",table:"schedule_entries"},()=>scheduleFullRefresh())
     .subscribe(status=>{
       if(status==="SUBSCRIBED")markSynced();
       else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")setSyncBadge("Realtime перепідключається","warn");
@@ -411,20 +437,22 @@ function startRealtimeSync(){
 }
 async function refreshAll(){
   const uid=session.user.id;
-  const [subjectsRes,tasksRes,statusRes,changesRes,scoresRes]=await Promise.all([
+  const [subjectsRes,tasksRes,statusRes,changesRes,scoresRes,scheduleRes]=await Promise.all([
     db.from("subjects").select("*").order("name"),
     db.from("tasks").select("*").order("deadline",{ascending:true,nullsFirst:false}),
     db.from("task_status").select("task_id,done").eq("user_id",uid),
     db.from("changes").select("*").order("created_at",{ascending:false}).limit(100),
-    db.from("subject_score_status").select("subject_id,values").eq("user_id",uid)
+    db.from("subject_score_status").select("subject_id,values").eq("user_id",uid),
+    db.from("schedule_entries").select("*").order("weekday").order("slot")
   ]);
-  [subjectsRes,tasksRes,statusRes,changesRes,scoresRes].forEach(r=>{if(r.error)throw r.error});
+  [subjectsRes,tasksRes,statusRes,changesRes,scoresRes,scheduleRes].forEach(r=>{if(r.error)throw r.error});
   state.subjects=subjectsRes.data||[];
   state.tasks=(tasksRes.data||[]).map(t=>({...t,done:false}));
   state.statuses=new Map((statusRes.data||[]).map(x=>[x.task_id,!!x.done]));
   state.tasks.forEach(t=>t.done=state.statuses.get(t.id)||false);
   state.changes=changesRes.data||[];
   state.scoreStates=new Map((scoresRes.data||[]).map(x=>[x.subject_id,x.values||{}]));
+  state.schedule=scheduleRes.data||[];
   markSynced();
 }
 
@@ -473,7 +501,7 @@ function renderQuickSubjects(){
   $("#subjectQuickLinks").innerHTML=state.subjects.map(s=>`<button class="subject-quick" data-qsubject="${s.id}"><span class="subject-dot" style="background:${esc(s.color||"#999")}"></span><span>${esc(s.short||s.name)}</span></button>`).join("");
   $$("[data-qsubject]").forEach(b=>b.onclick=()=>openSubject(b.dataset.qsubject));
 }
-function render(){syncPermissionsUI();renderQuickSubjects();syncNav();if(ui.selectedSubjectId)return renderSubject(ui.selectedSubjectId);if(ui.view==="home")renderHome();else if(ui.view==="diary")renderDiary();else if(ui.view==="subjects")renderSubjects();else renderChanges()}
+function render(){syncPermissionsUI();renderQuickSubjects();syncNav();if(ui.selectedSubjectId)return renderSubject(ui.selectedSubjectId);if(ui.view==="home")renderHome();else if(ui.view==="schedule")renderSchedule();else if(ui.view==="diary")renderDiary();else if(ui.view==="subjects")renderSubjects();else renderChanges()}
 function openSubject(id,tab="overview"){ui.selectedSubjectId=id;ui.subjectTab=tab;render();$("#sidebar").classList.remove("open")}
 
 function deadlineBadge(t){
@@ -660,6 +688,114 @@ function subjectScorePanel(s){
   const rules=s.score_rules||[],values=state.scoreStates.get(s.id)||{};
   const earned=rules.reduce((sum,r)=>sum+Number(values[r.id]??0),0),max=rules.reduce((sum,r)=>sum+Number(r.max||0),0),min=Number(s.minimum||60),remain=Math.max(0,min-earned),pct=max?Math.min(100,Math.round(earned/max*100)):0;
   return`<div class="subject-score-stack"><div class="card"><div class="card-header"><div><h3>Мої бали</h3><p>Зберігаються тільки у твоєму акаунті</p></div>${isAdmin()?`<button class="secondary-btn" id="editRules">Налаштувати правила</button>`:""}</div><div class="card-pad">${rules.length?`<table class="score-table"><thead><tr><th>Складова</th><th>Я отримав</th><th>Максимум</th></tr></thead><tbody>${rules.map(r=>`<tr><td><strong>${esc(r.name)}</strong></td><td><input class="score-input" type="number" min="0" max="${Number(r.max||0)}" step=".1" value="${Number(values[r.id]??0)}" data-score="${r.id}"></td><td>${clean(r.max)}</td></tr>`).join("")}</tbody></table>`:`<div class="empty"><strong>Правила не задані</strong></div>`}</div></div><div class="score-summary"><div class="kicker" style="color:#94a3b8">Твій результат</div><div class="big">${clean(earned)} / ${clean(max)}</div><div class="progress"><div style="width:${pct}%"></div></div><p>${earned>=min?`Ти вже набрав мінімум ${min}.`:`До мінімуму ${min} тобі ще ${clean(remain)} ${plural(remain,"бал","бали","балів")}.`}</p></div></div>`;
+}
+
+
+function scheduleEntriesFor(week,weekday,slot){
+  return state.schedule
+    .filter(x=>(Number(x.week_no)===0||Number(x.week_no)===Number(week))&&Number(x.weekday)===Number(weekday)&&Number(x.slot)===Number(slot))
+    .sort((a,b)=>String(a.title||"").localeCompare(String(b.title||""),"uk"));
+}
+function scheduleCard(entry){
+  const subject=subjectById(entry.subject_id);
+  const kind=CLASS_TYPES[entry.class_type]||CLASS_TYPES.lecture;
+  return `<div class="schedule-card ${kind.css}">
+    ${isAdmin()?`<button class="schedule-edit" data-edit-schedule="${entry.id}" title="Редагувати">✎</button>`:""}
+    <span class="schedule-type">${kind.label}${Number(entry.week_no)===0?" · щотижня":""}</span>
+    <h4>${esc(entry.title||subject?.name||"Без назви")}</h4>
+    <div class="schedule-meta">
+      <span>🎓 ${esc(subject?.teacher||"Викладач не вказаний")}</span>
+      ${entry.room?`<span>📍 ${esc(entry.room)}</span>`:""}
+    </div>
+    ${entry.note?`<div class="schedule-note">${esc(entry.note)}</div>`:""}
+  </div>`;
+}
+function renderSchedule(){
+  setHeader("Розклад","Розклад занять групи");
+  const week=Number(ui.scheduleWeek)||1;
+  const rows=SCHEDULE_SLOTS.map(slot=>{
+    const cells=SCHEDULE_DAYS.map(day=>{
+      const entries=scheduleEntriesFor(week,day.id,slot.id);
+      return `<div class="schedule-cell">
+        ${entries.map(scheduleCard).join("")}
+        ${isAdmin()?`<button class="schedule-add" data-add-schedule data-day="${day.id}" data-slot="${slot.id}" title="Додати пару">＋</button>`:""}
+      </div>`;
+    }).join("");
+    return `<div class="schedule-time"><strong>${slot.start}</strong><small>${slot.end}</small></div>${cells}`;
+  }).join("");
+  $("#appContent").innerHTML=`
+    <div class="schedule-head">
+      <div><h2>Розклад занять</h2><div class="muted">Викладач автоматично підтягується з даних предмету.</div></div>
+      <div class="week-switch">
+        <button class="week-btn ${week===1?"active":""}" data-schedule-week="1">Перший тиждень</button>
+        <button class="week-btn ${week===2?"active":""}" data-schedule-week="2">Другий тиждень</button>
+      </div>
+    </div>
+    <div class="schedule-board"><div class="schedule-grid">
+      <div class="schedule-corner"></div>
+      ${SCHEDULE_DAYS.map(d=>`<div class="schedule-day">${d.label}</div>`).join("")}
+      ${rows}
+    </div></div>`;
+  $("[data-schedule-week]").forEach(b=>b.onclick=()=>{ui.scheduleWeek=Number(b.dataset.scheduleWeek);renderSchedule();syncPermissionsUI()});
+  $("[data-edit-schedule]").forEach(b=>b.onclick=()=>openScheduleForm(b.dataset.editSchedule));
+  $("[data-add-schedule]").forEach(b=>b.onclick=()=>openScheduleForm(null,{weekday:Number(b.dataset.day),slot:Number(b.dataset.slot),week_no:week}));
+}
+async function deleteScheduleEntry(id){
+  if(!isAdmin())return toast("Недостатньо прав");
+  const entry=state.schedule.find(x=>x.id===id);if(!entry)return;
+  const subject=subjectById(entry.subject_id);
+  if(!confirm(`Видалити пару «${entry.title||subject?.name||"Без назви"}» з розкладу?`))return;
+  const {error}=await db.from("schedule_entries").delete().eq("id",id);
+  if(error)return toast(error.message||"Не вдалося видалити пару");
+  await logChange("delete","Пару видалено з розкладу",entry.title||subject?.name||"");
+  closeModal();await refreshAll();ui.view="schedule";ui.selectedSubjectId=null;render();
+}
+function openScheduleForm(id=null,defaults={}){
+  if(!isAdmin())return toast("Недостатньо прав");
+  if(!state.subjects.length)return toast("Спочатку додай хоча б один предмет");
+  const entry=id?state.schedule.find(x=>x.id===id):null;
+  const subjectId=entry?.subject_id||defaults.subject_id||state.subjects[0]?.id||"";
+  const weekNo=Number(entry?.week_no??defaults.week_no??ui.scheduleWeek??1);
+  const weekday=Number(entry?.weekday??defaults.weekday??1);
+  const slot=Number(entry?.slot??defaults.slot??1);
+  const classType=entry?.class_type||defaults.class_type||"lecture";
+  const teacher=subjectById(subjectId)?.teacher||"Викладач не вказаний";
+  openModal(entry?"Редагувати пару":"Додати пару","Зміни одразу синхронізуються для всієї групи.",`
+    <form id="scheduleForm"><div class="form-grid">
+      <div class="field full-span"><label>Предмет</label><select name="subject_id" id="scheduleSubject">${state.subjects.map(x=>`<option value="${x.id}" ${x.id===subjectId?"selected":""}>${esc(x.name)}</option>`).join("")}</select><div class="teacher-preview" id="scheduleTeacher">🎓 ${esc(teacher)}</div></div>
+      <div class="field"><label>Що це</label><select name="class_type">${Object.entries(CLASS_TYPES).map(([k,v])=>`<option value="${k}" ${k===classType?"selected":""}>${v.label}</option>`).join("")}</select></div>
+      <div class="field"><label>Тиждень</label><select name="week_no"><option value="1" ${weekNo===1?"selected":""}>Перший</option><option value="2" ${weekNo===2?"selected":""}>Другий</option><option value="0" ${weekNo===0?"selected":""}>Обидва тижні</option></select></div>
+      <div class="field"><label>День</label><select name="weekday">${SCHEDULE_DAYS.map(d=>`<option value="${d.id}" ${d.id===weekday?"selected":""}>${d.label}</option>`).join("")}</select></div>
+      <div class="field"><label>Пара</label><select name="slot">${SCHEDULE_SLOTS.map(t=>`<option value="${t.id}" ${t.id===slot?"selected":""}>${t.start}–${t.end}</option>`).join("")}</select></div>
+      <div class="field full-span"><label>Назва в розкладі <span class="muted" style="font-weight:500">(необов'язково)</span></label><input name="title" value="${attr(entry?.title||"")}" placeholder="Якщо порожньо — показується назва предмету"></div>
+      <div class="field"><label>Аудиторія <span class="muted" style="font-weight:500">(необов'язково)</span></label><input name="room" value="${attr(entry?.room||"")}" placeholder="Напр. 1-218"></div>
+      <div class="field full-span"><label>Примітка</label><textarea name="note" rows="2">${esc(entry?.note||"")}</textarea></div>
+    </div><div class="form-actions">${entry?`<button type="button" class="danger-btn" id="deleteSchedule">Видалити</button>`:""}<button type="button" class="secondary-btn" id="cancelSchedule">Скасувати</button><button class="primary-btn" type="submit">Зберегти</button></div></form>`);
+  $("#cancelSchedule").onclick=closeModal;
+  $("#deleteSchedule")?.addEventListener("click",()=>deleteScheduleEntry(entry.id));
+  $("#scheduleSubject").onchange=e=>{$("#scheduleTeacher").textContent="🎓 "+(subjectById(e.target.value)?.teacher||"Викладач не вказаний")};
+  $("#scheduleForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=Object.fromEntries(new FormData(e.target).entries());
+    const payload={
+      subject_id:f.subject_id,
+      weekday:Number(f.weekday),
+      week_no:Number(f.week_no),
+      slot:Number(f.slot),
+      class_type:f.class_type,
+      title:(f.title||"").trim()||null,
+      room:(f.room||"").trim()||null,
+      note:(f.note||"").trim()||null,
+      updated_at:new Date().toISOString()
+    };
+    const r=entry?await db.from("schedule_entries").update(payload).eq("id",entry.id):await db.from("schedule_entries").insert(payload);
+    if(r.error)return toast(r.error.message||"Не вдалося зберегти пару");
+    const subj=subjectById(payload.subject_id);
+    await logChange(entry?"edit":"add",entry?"Пару в розкладі змінено":"Пару додано в розклад",payload.title||subj?.name||"");
+    closeModal();await refreshAll();ui.view="schedule";ui.selectedSubjectId=null;
+    if(payload.week_no===1||payload.week_no===2)ui.scheduleWeek=payload.week_no;
+    render();toast(entry?"Пару оновлено":"Пару додано");
+  };
 }
 
 function renderDiary(){
