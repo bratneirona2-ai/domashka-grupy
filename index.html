@@ -115,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 10 · розклад + realtime</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 11 · викладачі за типом + лекції</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -159,17 +159,18 @@ let realtimeRefreshTimer = null;
 let realtimeBusy = false;
 let lastSyncAt = null;
 
-const typeLabels={lab:"Лабораторні",practice:"Практичні",test:"Тести"};
-const typeSingle={lab:"Лабораторна",practice:"Практична",test:"Тест"};
+const typeLabels={lecture:"Лекції",lab:"Лабораторні",practice:"Практичні",test:"Тести"};
+const typeSingle={lecture:"Лекція",lab:"Лабораторна",practice:"Практична",test:"Тест"};
 const SUBJECT_TABS=[
   {key:"overview",label:"Огляд"},
+  {key:"lecture",label:"Лекції"},
   {key:"lab",label:"Лабораторні"},
   {key:"practice",label:"Практичні"},
   {key:"test",label:"Тести"},
   {key:"score",label:"Мої бали"}
 ];
 const DEFAULT_SUBJECT_TABS=SUBJECT_TABS.map(x=>x.key);
-const TASK_TAB_KEYS=["lab","practice","test"];
+const TASK_TAB_KEYS=["lecture","lab","practice","test"];
 const SCHEDULE_DAYS=[
   {id:1,label:"Понеділок"},{id:2,label:"Вівторок"},{id:3,label:"Середа"},
   {id:4,label:"Четвер"},{id:5,label:"П'ятниця"},{id:6,label:"Субота"}
@@ -460,11 +461,22 @@ function subjectById(id){return state.subjects.find(s=>s.id===id)}
 function tasksForSubject(id){return state.tasks.filter(t=>t.subject_id===id)}
 function enabledTabs(s){
   const raw=Array.isArray(s?.enabled_tabs)?s.enabled_tabs:DEFAULT_SUBJECT_TABS;
-  const valid=raw.filter(k=>DEFAULT_SUBJECT_TABS.includes(k));
-  return valid.length?[...new Set(valid)]:["overview"];
+  const selected=new Set(raw.filter(k=>DEFAULT_SUBJECT_TABS.includes(k)));
+  const valid=SUBJECT_TABS.map(x=>x.key).filter(k=>selected.has(k));
+  return valid.length?valid:["overview"];
 }
 function enabledTaskTypes(s){return enabledTabs(s).filter(k=>TASK_TAB_KEYS.includes(k))}
 function subjectTabLabel(key){return SUBJECT_TABS.find(x=>x.key===key)?.label||key}
+function teacherFor(subject,classType){
+  if(!subject)return"";
+  const byType={
+    lecture:subject.teacher_lecture,
+    practice:subject.teacher_practice,
+    lab:subject.teacher_lab,
+    seminar:subject.teacher_seminar
+  };
+  return String(byType[classType]||subject.teacher||"").trim();
+}
 function localToday(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function isDateOnly(v){return /^\d{4}-\d{2}-\d{2}$/.test(String(v||""))}
 function localDateFromYmd(v,endOfDay=false){
@@ -652,8 +664,14 @@ function renderSubject(id){
 }
 
 function subjectInfoCard(s){
+  const teacherRows=[
+    ["Лекції",s.teacher_lecture],
+    ["Практичні",s.teacher_practice],
+    ["Лабораторні",s.teacher_lab],
+    ["Семінари",s.teacher_seminar]
+  ].filter(([,v])=>String(v??"").trim()!=="");
+  const generalTeacher=String(s.teacher??"").trim();
   const rows=[
-    ["Викладач",s.teacher],
     ["Пари",s.schedule],
     ["Форма контролю",s.assessment],
     ["Мінімум",s.minimum!==null&&s.minimum!==undefined?clean(s.minimum):""],
@@ -662,8 +680,13 @@ function subjectInfoCard(s){
     ["Нотатки",s.notes]
   ].filter(([,v])=>String(v??"").trim()!=="");
   const contacts=String(s.teacher_contacts??"").trim();
-  const hasAnything=rows.length||contacts;
-  return`<div class="card subject-info-card"><div class="card-header"><div><h3>Про предмет</h3><p>Спільні правила для всієї групи</p></div></div><div class="card-pad info-list">${hasAnything?`${rows.slice(0,1).map(([label,value])=>`<div class="info-row"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}${contacts?`<div class="teacher-contact-block"><h4>Контактні дані викладача</h4><p>${esc(contacts)}</p></div>`:""}${rows.slice(1).map(([label,value])=>`<div class="info-row"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}`:`<div class="subject-info-empty"><strong>Інформацію ще не додали</strong></div>`}</div></div>`;
+  const hasAnything=teacherRows.length||generalTeacher||rows.length||contacts;
+  return`<div class="card subject-info-card"><div class="card-header"><div><h3>Про предмет</h3><p>Спільні правила для всієї групи</p></div></div><div class="card-pad info-list">${hasAnything?`
+    ${teacherRows.map(([label,value])=>`<div class="info-row"><span>Викладач · ${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}
+    ${!teacherRows.length&&generalTeacher?`<div class="info-row"><span>Викладач</span><strong>${esc(generalTeacher)}</strong></div>`:""}
+    ${contacts?`<div class="teacher-contact-block"><h4>Контактні дані викладача</h4><p>${esc(contacts)}</p></div>`:""}
+    ${rows.map(([label,value])=>`<div class="info-row"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}
+  `:`<div class="subject-info-empty"><strong>Інформацію ще не додали</strong></div>`}</div></div>`;
 }
 
 function subjectTabPanel(s,tab){
@@ -704,7 +727,7 @@ function scheduleCard(entry){
     <span class="schedule-type">${kind.label}${Number(entry.week_no)===0?" · щотижня":""}</span>
     <h4>${esc(entry.title||subject?.name||"Без назви")}</h4>
     <div class="schedule-meta">
-      <span>🎓 ${esc(subject?.teacher||"Викладач не вказаний")}</span>
+      <span>🎓 ${esc(teacherFor(subject,entry.class_type)||"Викладач не вказаний")}</span>
       ${entry.room?`<span>📍 ${esc(entry.room)}</span>`:""}
     </div>
     ${entry.note?`<div class="schedule-note">${esc(entry.note)}</div>`:""}
@@ -759,11 +782,11 @@ function openScheduleForm(id=null,defaults={}){
   const weekday=Number(entry?.weekday??defaults.weekday??1);
   const slot=Number(entry?.slot??defaults.slot??1);
   const classType=entry?.class_type||defaults.class_type||"lecture";
-  const teacher=subjectById(subjectId)?.teacher||"Викладач не вказаний";
+  const teacher=teacherFor(subjectById(subjectId),classType)||"Викладач не вказаний";
   openModal(entry?"Редагувати пару":"Додати пару","Зміни одразу синхронізуються для всієї групи.",`
     <form id="scheduleForm"><div class="form-grid">
       <div class="field full-span"><label>Предмет</label><select name="subject_id" id="scheduleSubject">${state.subjects.map(x=>`<option value="${x.id}" ${x.id===subjectId?"selected":""}>${esc(x.name)}</option>`).join("")}</select><div class="teacher-preview" id="scheduleTeacher">🎓 ${esc(teacher)}</div></div>
-      <div class="field"><label>Що це</label><select name="class_type">${Object.entries(CLASS_TYPES).map(([k,v])=>`<option value="${k}" ${k===classType?"selected":""}>${v.label}</option>`).join("")}</select></div>
+      <div class="field"><label>Що це</label><select name="class_type" id="scheduleClassType">${Object.entries(CLASS_TYPES).map(([k,v])=>`<option value="${k}" ${k===classType?"selected":""}>${v.label}</option>`).join("")}</select></div>
       <div class="field"><label>Тиждень</label><select name="week_no"><option value="1" ${weekNo===1?"selected":""}>Перший</option><option value="2" ${weekNo===2?"selected":""}>Другий</option><option value="0" ${weekNo===0?"selected":""}>Обидва тижні</option></select></div>
       <div class="field"><label>День</label><select name="weekday">${SCHEDULE_DAYS.map(d=>`<option value="${d.id}" ${d.id===weekday?"selected":""}>${d.label}</option>`).join("")}</select></div>
       <div class="field"><label>Пара</label><select name="slot">${SCHEDULE_SLOTS.map(t=>`<option value="${t.id}" ${t.id===slot?"selected":""}>${t.start}–${t.end}</option>`).join("")}</select></div>
@@ -773,7 +796,13 @@ function openScheduleForm(id=null,defaults={}){
     </div><div class="form-actions">${entry?`<button type="button" class="danger-btn" id="deleteSchedule">Видалити</button>`:""}<button type="button" class="secondary-btn" id="cancelSchedule">Скасувати</button><button class="primary-btn" type="submit">Зберегти</button></div></form>`);
   $("#cancelSchedule").onclick=closeModal;
   $("#deleteSchedule")?.addEventListener("click",()=>deleteScheduleEntry(entry.id));
-  $("#scheduleSubject").onchange=e=>{$("#scheduleTeacher").textContent="🎓 "+(subjectById(e.target.value)?.teacher||"Викладач не вказаний")};
+  const refreshScheduleTeacher=()=>{
+    const subject=subjectById($("#scheduleSubject").value);
+    const classType=$("#scheduleClassType").value;
+    $("#scheduleTeacher").textContent="🎓 "+(teacherFor(subject,classType)||"Викладач не вказаний");
+  };
+  $("#scheduleSubject").onchange=refreshScheduleTeacher;
+  $("#scheduleClassType").onchange=refreshScheduleTeacher;
   $("#scheduleForm").onsubmit=async e=>{
     e.preventDefault();
     const f=Object.fromEntries(new FormData(e.target).entries());
@@ -891,7 +920,7 @@ function openTaskForm(taskId=null,defaults={}){
     if(currentType&&TASK_TAB_KEYS.includes(currentType)&&!keys.includes(currentType))keys.push(currentType);
     return keys.map(k=>`<option value="${k}" ${k===currentType?"selected":""}>${typeSingle[k]}</option>`).join("");
   };
-  if(!t && initialSubject && !initialTypes.length)return toast("У цього предмету немає вкладок для завдань. Увімкни Лабораторні, Практичні або Тести в редагуванні предмету.");
+  if(!t && initialSubject && !initialTypes.length)return toast("У цього предмету немає вкладок для завдань. Увімкни Лекції, Лабораторні, Практичні або Тести в редагуванні предмету.");
   openModal(t?"Редагувати завдання":"Нове завдання","Це спільне ДЗ — після збереження його побачить уся група.",`
   <form id="taskForm"><div class="form-grid">
     <div class="field"><label>Предмет</label><select name="subject_id" id="taskSubjectSelect">${state.subjects.map(s=>`<option value="${s.id}" ${s.id===subjectId?"selected":""}>${esc(s.name)}</option>`).join("")}</select></div>
@@ -1012,7 +1041,12 @@ function openSubjectForm(id=null){
     <div class="field full-span"><label>Назва</label><input name="name" required value="${attr(s?.name||"")}"></div>
     <div class="field"><label>Коротка назва</label><input name="short" value="${attr(s?.short||"")}"></div>
     <div class="field"><label>Колір</label><input type="color" name="color" value="${attr(s?.color||"#315efb")}"></div>
-    <div class="field"><label>Викладач</label><input name="teacher" value="${attr(s?.teacher||"")}"></div>
+    <div class="field full-span"><label>Викладачі за типом заняття</label><div class="field-hint">У розкладі автоматично показуватиметься викладач саме для вибраного типу пари.</div></div>
+    <div class="field"><label>Лекції</label><input name="teacher_lecture" value="${attr(s?.teacher_lecture||"")}" placeholder="ПІБ викладача"></div>
+    <div class="field"><label>Практичні</label><input name="teacher_practice" value="${attr(s?.teacher_practice||"")}" placeholder="ПІБ викладача"></div>
+    <div class="field"><label>Лабораторні</label><input name="teacher_lab" value="${attr(s?.teacher_lab||"")}" placeholder="ПІБ викладача"></div>
+    <div class="field"><label>Семінари</label><input name="teacher_seminar" value="${attr(s?.teacher_seminar||"")}" placeholder="ПІБ викладача"></div>
+    <div class="field"><label>Викладач за замовчуванням</label><input name="teacher" value="${attr(s?.teacher||"")}" placeholder="Старі дані / резерв"></div>
     <div class="field"><label>Контактні дані викладача</label><input name="teacher_contacts" value="${attr(s?.teacher_contacts||"")}" placeholder="Telegram, пошта, кабінет..."></div>
     <div class="field full-span"><label>Силабус / підпис під назвою</label><textarea name="syllabus" rows="2" placeholder="Наприклад: Силабус: https://..."></textarea><div class="field-hint">Залиш порожнім — цей рядок на сторінці предмету не показуватиметься.</div></div>
     <div class="field"><label>Розклад</label><input name="schedule" value="${attr(s?.schedule||"")}"></div>
@@ -1032,7 +1066,12 @@ function openSubjectForm(id=null){
     if(!enabled.length)return toast("Залиш хоча б одну вкладку предмету");
     const p={
       name:f.name.trim(),short:f.short.trim()||f.name.trim(),color:f.color,
-      teacher:f.teacher.trim(),teacher_contacts:(f.teacher_contacts||"").trim(),syllabus:(f.syllabus||"").trim(),
+      teacher:(f.teacher||"").trim(),
+      teacher_lecture:(f.teacher_lecture||"").trim(),
+      teacher_practice:(f.teacher_practice||"").trim(),
+      teacher_lab:(f.teacher_lab||"").trim(),
+      teacher_seminar:(f.teacher_seminar||"").trim(),
+      teacher_contacts:(f.teacher_contacts||"").trim(),syllabus:(f.syllabus||"").trim(),
       schedule:f.schedule.trim(),assessment:f.assessment.trim(),minimum:Number(f.minimum||0),
       admission:f.admission.trim(),retakes:f.retakes.trim(),notes:f.notes.trim(),enabled_tabs:enabled,
       updated_at:new Date().toISOString()
