@@ -736,9 +736,9 @@ function renderSchedule(){
       ${SCHEDULE_DAYS.map(d=>`<div class="schedule-day">${d.label}</div>`).join("")}
       ${rows}
     </div></div>`;
-  $("[data-schedule-week]").forEach(b=>b.onclick=()=>{ui.scheduleWeek=Number(b.dataset.scheduleWeek);renderSchedule();syncPermissionsUI()});
-  $("[data-edit-schedule]").forEach(b=>b.onclick=()=>openScheduleForm(b.dataset.editSchedule));
-  $("[data-add-schedule]").forEach(b=>b.onclick=()=>openScheduleForm(null,{weekday:Number(b.dataset.day),slot:Number(b.dataset.slot),week_no:week}));
+  $$("[data-schedule-week]").forEach(b=>b.onclick=()=>{ui.scheduleWeek=Number(b.dataset.scheduleWeek);renderSchedule();syncPermissionsUI()});
+  $$("[data-edit-schedule]").forEach(b=>b.onclick=()=>openScheduleForm(b.dataset.editSchedule));
+  $$("[data-add-schedule]").forEach(b=>b.onclick=()=>openScheduleForm(null,{weekday:Number(b.dataset.day),slot:Number(b.dataset.slot),week_no:week}));
 }
 async function deleteScheduleEntry(id){
   if(!isAdmin())return toast("Недостатньо прав");
