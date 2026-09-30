@@ -159,18 +159,25 @@ let realtimeRefreshTimer = null;
 let realtimeBusy = false;
 let lastSyncAt = null;
 
-const typeLabels={lecture:"Лекції",lab:"Лабораторні",practice:"Практичні",test:"Тести"};
-const typeSingle={lecture:"Лекція",lab:"Лабораторна",practice:"Практична",test:"Тест"};
+const typeLabels={lecture:"Лекції",lab:"Лабораторні",seminar:"Семінари",practice:"Практичні",test:"Тести"};
+const typeSingle={lecture:"Лекція",lab:"Лабораторна",seminar:"Семінар",practice:"Практична",test:"Тест"};
 const SUBJECT_TABS=[
   {key:"overview",label:"Огляд"},
   {key:"lecture",label:"Лекції"},
   {key:"lab",label:"Лабораторні"},
+  {key:"seminar",label:"Семінари"},
   {key:"practice",label:"Практичні"},
   {key:"test",label:"Тести"},
   {key:"score",label:"Мої бали"}
 ];
 const DEFAULT_SUBJECT_TABS=SUBJECT_TABS.map(x=>x.key);
-const TASK_TAB_KEYS=["lecture","lab","practice","test"];
+const TASK_TAB_KEYS=["lecture","lab","seminar","practice","test"];
+const SUBJECT_CLASS_INFO={
+  lecture:{label:"Лекції",teacher:"teacher_lecture",contact:"teacher_contact_lecture"},
+  lab:{label:"Лабораторні",teacher:"teacher_lab",contact:"teacher_contact_lab"},
+  seminar:{label:"Семінари",teacher:"teacher_seminar",contact:"teacher_contact_seminar"},
+  practice:{label:"Практичні",teacher:"teacher_practice",contact:"teacher_contact_practice"}
+};
 const SCHEDULE_DAYS=[
   {id:1,label:"Понеділок"},{id:2,label:"Вівторок"},{id:3,label:"Середа"},
   {id:4,label:"Четвер"},{id:5,label:"П'ятниця"},{id:6,label:"Субота"}
@@ -469,13 +476,13 @@ function enabledTaskTypes(s){return enabledTabs(s).filter(k=>TASK_TAB_KEYS.inclu
 function subjectTabLabel(key){return SUBJECT_TABS.find(x=>x.key===key)?.label||key}
 function teacherFor(subject,classType){
   if(!subject)return"";
-  const byType={
-    lecture:subject.teacher_lecture,
-    practice:subject.teacher_practice,
-    lab:subject.teacher_lab,
-    seminar:subject.teacher_seminar
-  };
-  return String(byType[classType]||subject.teacher||"").trim();
+  const field=SUBJECT_CLASS_INFO[classType]?.teacher;
+  return String((field?subject[field]:"")||subject.teacher||"").trim();
+}
+function contactFor(subject,classType){
+  if(!subject)return"";
+  const field=SUBJECT_CLASS_INFO[classType]?.contact;
+  return String((field?subject[field]:"")||subject.teacher_contacts||"").trim();
 }
 function localToday(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function isDateOnly(v){return /^\d{4}-\d{2}-\d{2}$/.test(String(v||""))}
@@ -639,7 +646,7 @@ function renderSubject(id){
       <div class="subject-hero-copy">
         <div class="subject-color" style="background:${esc(s.color||"#111827")}"></div>
         <h2>${esc(s.name)}</h2>
-        ${s.syllabus?`<p class="subject-syllabus">${esc(s.syllabus)}</p>`:""}
+
       </div>
       <div class="inline">
         <button class="secondary-btn" id="backSubjects">← До предметів</button>
@@ -651,42 +658,48 @@ function renderSubject(id){
       ${isAdmin()?`<button class="secondary-btn subject-tabs-admin" id="configureSubjectTabs">⚙ Вкладки</button>`:""}
     </div>
     <div class="subject-layout">
-      ${subjectInfoCard(s)}
+      ${subjectInfoCard(s,ui.subjectTab)}
       <div class="subject-panel">${body}</div>
     </div>`;
   $("#backSubjects").onclick=()=>{ui.selectedSubjectId=null;ui.view="subjects";render()};
   if($("#editSubject"))$("#editSubject").onclick=()=>openSubjectForm(s.id);
   if($("#deleteSubjectHere"))$("#deleteSubjectHere").onclick=()=>deleteSubjectById(s.id);
   if($("#configureSubjectTabs"))$("#configureSubjectTabs").onclick=()=>openSubjectTabs(s.id);
-  $$("[data-stab]").forEach(b=>b.onclick=()=>{ui.subjectTab=b.dataset.stab;render()});
+  $("#editOverviewInfo")?.addEventListener("click",()=>openOverviewInfoForm(s.id));
+  $("[data-edit-class-info]").forEach(b=>b.onclick=()=>openClassInfoForm(s.id,b.dataset.editClassInfo));
+  $("[data-stab]").forEach(b=>b.onclick=()=>{ui.subjectTab=b.dataset.stab;render()});
   $$("[data-add-type]").forEach(b=>b.onclick=()=>openTaskForm(null,{subject_id:s.id,type:b.dataset.addType}));
   wireTasks($("#appContent"));wireScores(s);
 }
 
-function subjectInfoCard(s){
-  const teacherRows=[
-    ["Лекції",s.teacher_lecture],
-    ["Практичні",s.teacher_practice],
-    ["Лабораторні",s.teacher_lab],
-    ["Семінари",s.teacher_seminar]
-  ].filter(([,v])=>String(v??"").trim()!=="");
-  const generalTeacher=String(s.teacher??"").trim();
-  const rows=[
-    ["Пари",s.schedule],
-    ["Форма контролю",s.assessment],
-    ["Мінімум",s.minimum!==null&&s.minimum!==undefined?clean(s.minimum):""],
-    ["Допуск",s.admission],
-    ["Перездачі",s.retakes],
-    ["Нотатки",s.notes]
-  ].filter(([,v])=>String(v??"").trim()!=="");
-  const contacts=String(s.teacher_contacts??"").trim();
-  const hasAnything=teacherRows.length||generalTeacher||rows.length||contacts;
-  return`<div class="card subject-info-card"><div class="card-header"><div><h3>Про предмет</h3><p>Спільні правила для всієї групи</p></div></div><div class="card-pad info-list">${hasAnything?`
-    ${teacherRows.map(([label,value])=>`<div class="info-row"><span>Викладач · ${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}
-    ${!teacherRows.length&&generalTeacher?`<div class="info-row"><span>Викладач</span><strong>${esc(generalTeacher)}</strong></div>`:""}
-    ${contacts?`<div class="teacher-contact-block"><h4>Контактні дані викладача</h4><p>${esc(contacts)}</p></div>`:""}
-    ${rows.map(([label,value])=>`<div class="info-row"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}
-  `:`<div class="subject-info-empty"><strong>Інформацію ще не додали</strong></div>`}</div></div>`;
+function subjectInfoCard(s,tab){
+  if(SUBJECT_CLASS_INFO[tab]){
+    const cfg=SUBJECT_CLASS_INFO[tab];
+    const teacher=teacherFor(s,tab);
+    const contact=contactFor(s,tab);
+    return `<div class="card subject-info-card">
+      <div class="card-header">
+        <div><h3>Про предмет · ${cfg.label}</h3><p>Інформація саме для цього типу занять</p></div>
+        ${isAdmin()?`<button class="secondary-btn" data-edit-class-info="${tab}">Редагувати</button>`:""}
+      </div>
+      <div class="card-pad info-list">
+        <div class="info-row"><span>Викладач · ${cfg.label}</span><strong>${esc(teacher||"—")}</strong></div>
+        <div class="info-row"><span>Контактні дані викладача</span><strong>${esc(contact||"—")}</strong></div>
+      </div>
+    </div>`;
+  }
+  const syllabus=String(s.syllabus??"").trim();
+  const assessment=String(s.assessment??"").trim();
+  return `<div class="card subject-info-card">
+    <div class="card-header">
+      <div><h3>Огляд предмету</h3><p>Загальна інформація</p></div>
+      ${isAdmin()?`<button class="secondary-btn" id="editOverviewInfo">Редагувати</button>`:""}
+    </div>
+    <div class="card-pad info-list">
+      <div class="info-row"><span>Силабус</span><strong>${esc(syllabus||"—")}</strong></div>
+      <div class="info-row"><span>Форма контролю</span><strong>${esc(assessment||"—")}</strong></div>
+    </div>
+  </div>`;
 }
 
 function subjectTabPanel(s,tab){
