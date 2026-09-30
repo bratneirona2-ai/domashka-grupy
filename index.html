@@ -115,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 15 · вкладки fixed v2</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 16 · вкладки fixed</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -665,8 +665,8 @@ function renderSubject(id){
   if($("#deleteSubjectHere"))$("#deleteSubjectHere").onclick=()=>deleteSubjectById(s.id);
   if($("#configureSubjectTabs"))$("#configureSubjectTabs").onclick=()=>openSubjectTabs(s.id);
   $("#editOverviewInfo")?.addEventListener("click",()=>openOverviewInfoForm(s.id));
-  $("[data-edit-class-info]").forEach(b=>b.onclick=()=>openClassInfoForm(s.id,b.dataset.editClassInfo));
-  $("[data-stab]").forEach(b=>b.onclick=()=>{ui.subjectTab=b.dataset.stab;render()});
+  document.querySelectorAll("[data-edit-class-info]").forEach(b=>b.onclick=()=>openClassInfoForm(s.id,b.dataset.editClassInfo));
+  document.querySelectorAll("[data-stab]").forEach(b=>b.onclick=()=>{ui.subjectTab=b.dataset.stab;render()});
   $$("[data-add-type]").forEach(b=>b.onclick=()=>openTaskForm(null,{subject_id:s.id,type:b.dataset.addType}));
   wireTasks($("#appContent"));wireScores(s);
 }
