@@ -115,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 16 · вкладки fixed</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 17 · без тестів</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -166,11 +166,10 @@ const SUBJECT_TABS=[
   {key:"lecture",label:"Лекції"},
   {key:"lab",label:"Лабораторні"},
   {key:"seminar",label:"Семінари"},
-  {key:"practice",label:"Практичні"},
-  {key:"test",label:"Тести"}
+  {key:"practice",label:"Практичні"}
 ];
 const DEFAULT_SUBJECT_TABS=SUBJECT_TABS.map(x=>x.key);
-const TASK_TAB_KEYS=["lecture","lab","seminar","practice","test"];
+const TASK_TAB_KEYS=["lecture","lab","seminar","practice"];
 const SUBJECT_CLASS_INFO={
   lecture:{label:"Лекції",teacher:"teacher_lecture",contact:"teacher_contact_lecture"},
   lab:{label:"Лабораторні",teacher:"teacher_lab",contact:"teacher_contact_lab"},
@@ -710,7 +709,8 @@ function subjectTabPanel(s,tab){
 }
 
 function subjectOverviewPanel(s){
-  const ts=tasksForSubject(s.id).slice().sort((a,b)=>(parseDate(a.deadline)||Infinity)-(parseDate(b.deadline)||Infinity));
+  const allowed=new Set(enabledTaskTypes(s));
+  const ts=tasksForSubject(s.id).filter(t=>allowed.has(t.type)).slice().sort((a,b)=>(parseDate(a.deadline)||Infinity)-(parseDate(b.deadline)||Infinity));
   const active=ts.filter(t=>!t.done).slice(0,6);
   return`<div class="card"><div class="card-header"><div><h3>Завдання</h3><p>Найближчі та актуальні</p></div>${isAdmin()&&enabledTaskTypes(s).length?`<button class="primary-btn" data-add-type="${enabledTaskTypes(s)[0]}">＋ Додати</button>`:""}</div>${active.length?`<div class="subject-overview-list">${active.map(t=>`<div class="subject-overview-item"><div><h4>${esc(t.title)}</h4><p>${esc(subjectTabLabel(t.type))}${t.deadline?` · до ${formatDateTime(t.deadline)}`:" · без дедлайну"}</p></div>${deadlineBadge(t)}</div>`).join("")}</div>`:`<div class="empty"><strong>Немає активних завдань</strong>Тут з’являться найближчі ДЗ.</div>`}</div>`;
 }
@@ -934,7 +934,7 @@ function openTaskForm(taskId=null,defaults={}){
     if(currentType&&TASK_TAB_KEYS.includes(currentType)&&!keys.includes(currentType))keys.push(currentType);
     return keys.map(k=>`<option value="${k}" ${k===currentType?"selected":""}>${typeSingle[k]}</option>`).join("");
   };
-  if(!t && initialSubject && !initialTypes.length)return toast("У цього предмету немає вкладок для завдань. Увімкни Лекції, Лабораторні, Семінари, Практичні або Тести в редагуванні предмету.");
+  if(!t && initialSubject && !initialTypes.length)return toast("У цього предмету немає вкладок для завдань. Увімкни Лекції, Лабораторні, Семінари або Практичні в редагуванні предмету.");
   openModal(t?"Редагувати завдання":"Нове завдання","Це спільне ДЗ — після збереження його побачить уся група.",`
   <form id="taskForm"><div class="form-grid">
     <div class="field"><label>Предмет</label><select name="subject_id" id="taskSubjectSelect">${state.subjects.map(s=>`<option value="${s.id}" ${s.id===subjectId?"selected":""}>${esc(s.name)}</option>`).join("")}</select></div>
