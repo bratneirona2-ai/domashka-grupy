@@ -115,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 11 · викладачі за типом + лекції</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 12 · окремі вкладки занять</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -738,7 +738,8 @@ function scheduleCard(entry){
   return `<div class="schedule-card ${kind.css}">
     ${isAdmin()?`<button class="schedule-edit" data-edit-schedule="${entry.id}" title="Редагувати">✎</button>`:""}
     <span class="schedule-type">${kind.label}${Number(entry.week_no)===0?" · щотижня":""}</span>
-    <h4>${esc(entry.title||subject?.name||"Без назви")}</h4>
+    <h4>${esc(subject?.name||entry.title||"Без назви")}</h4>
+    ${entry.title&&entry.title!==subject?.name?`<div class="schedule-note">${esc(entry.title)}</div>`:""}
     <div class="schedule-meta">
       <span>🎓 ${esc(teacherFor(subject,entry.class_type)||"Викладач не вказаний")}</span>
       ${entry.room?`<span>📍 ${esc(entry.room)}</span>`:""}
@@ -761,7 +762,7 @@ function renderSchedule(){
   }).join("");
   $("#appContent").innerHTML=`
     <div class="schedule-head">
-      <div><h2>Розклад занять</h2><div class="muted">Викладач автоматично підтягується з даних предмету.</div></div>
+      <div><h2>Розклад занять</h2><div class="muted">Кожна лекція, лабораторна, семінар і практика — окрема пара з назвою предмета.</div></div>
       <div class="week-switch">
         <button class="week-btn ${week===1?"active":""}" data-schedule-week="1">Перший тиждень</button>
         <button class="week-btn ${week===2?"active":""}" data-schedule-week="2">Другий тиждень</button>
@@ -803,7 +804,7 @@ function openScheduleForm(id=null,defaults={}){
       <div class="field"><label>Тиждень</label><select name="week_no"><option value="1" ${weekNo===1?"selected":""}>Перший</option><option value="2" ${weekNo===2?"selected":""}>Другий</option><option value="0" ${weekNo===0?"selected":""}>Обидва тижні</option></select></div>
       <div class="field"><label>День</label><select name="weekday">${SCHEDULE_DAYS.map(d=>`<option value="${d.id}" ${d.id===weekday?"selected":""}>${d.label}</option>`).join("")}</select></div>
       <div class="field"><label>Пара</label><select name="slot">${SCHEDULE_SLOTS.map(t=>`<option value="${t.id}" ${t.id===slot?"selected":""}>${t.start}–${t.end}</option>`).join("")}</select></div>
-      <div class="field full-span"><label>Назва в розкладі <span class="muted" style="font-weight:500">(необов'язково)</span></label><input name="title" value="${attr(entry?.title||"")}" placeholder="Якщо порожньо — показується назва предмету"></div>
+      <div class="field full-span"><label>Додаткова назва / тема <span class="muted" style="font-weight:500">(необов'язково)</span></label><input name="title" value="${attr(entry?.title||"")}" placeholder="Назва предмету показується автоматично"></div>
       <div class="field"><label>Аудиторія <span class="muted" style="font-weight:500">(необов'язково)</span></label><input name="room" value="${attr(entry?.room||"")}" placeholder="Напр. 1-218"></div>
       <div class="field full-span"><label>Примітка</label><textarea name="note" rows="2">${esc(entry?.note||"")}</textarea></div>
     </div><div class="form-actions">${entry?`<button type="button" class="danger-btn" id="deleteSchedule">Видалити</button>`:""}<button type="button" class="secondary-btn" id="cancelSchedule">Скасувати</button><button class="primary-btn" type="submit">Зберегти</button></div></form>`);
@@ -933,7 +934,7 @@ function openTaskForm(taskId=null,defaults={}){
     if(currentType&&TASK_TAB_KEYS.includes(currentType)&&!keys.includes(currentType))keys.push(currentType);
     return keys.map(k=>`<option value="${k}" ${k===currentType?"selected":""}>${typeSingle[k]}</option>`).join("");
   };
-  if(!t && initialSubject && !initialTypes.length)return toast("У цього предмету немає вкладок для завдань. Увімкни Лекції, Лабораторні, Практичні або Тести в редагуванні предмету.");
+  if(!t && initialSubject && !initialTypes.length)return toast("У цього предмету немає вкладок для завдань. Увімкни Лекції, Лабораторні, Семінари, Практичні або Тести в редагуванні предмету.");
   openModal(t?"Редагувати завдання":"Нове завдання","Це спільне ДЗ — після збереження його побачить уся група.",`
   <form id="taskForm"><div class="form-grid">
     <div class="field"><label>Предмет</label><select name="subject_id" id="taskSubjectSelect">${state.subjects.map(s=>`<option value="${s.id}" ${s.id===subjectId?"selected":""}>${esc(s.name)}</option>`).join("")}</select></div>
@@ -1045,6 +1046,55 @@ function openSubjectTabs(id){
   };
 }
 
+function openOverviewInfoForm(id){
+  if(!isAdmin())return toast("Недостатньо прав");
+  const s=subjectById(id);if(!s)return;
+  openModal("Огляд предмету",s.name,`
+    <form id="overviewInfoForm"><div class="form-grid">
+      <div class="field full-span"><label>Силабус</label><textarea name="syllabus" rows="4" placeholder="Посилання, опис або основна інформація">${esc(s.syllabus||"")}</textarea></div>
+      <div class="field full-span"><label>Форма контролю</label><input name="assessment" value="${attr(s.assessment||"")}" placeholder="Екзамен, залік, диф. залік..."></div>
+    </div><div class="form-actions"><button type="button" class="secondary-btn" id="cancelOverviewInfo">Скасувати</button><button class="primary-btn">Зберегти</button></div></form>`);
+  $("#cancelOverviewInfo").onclick=closeModal;
+  $("#overviewInfoForm").onsubmit=async e=>{
+    e.preventDefault();
+    const fd=new FormData(e.target);
+    const payload={
+      syllabus:String(fd.get("syllabus")||"").trim(),
+      assessment:String(fd.get("assessment")||"").trim(),
+      updated_at:new Date().toISOString()
+    };
+    const {error}=await db.from("subjects").update(payload).eq("id",s.id);
+    if(error)return toast(error.message);
+    await logChange("edit","Огляд предмету оновлено",s.name);
+    closeModal();await refreshAll();render();toast("Огляд оновлено");
+  };
+}
+
+function openClassInfoForm(id,type){
+  if(!isAdmin())return toast("Недостатньо прав");
+  const s=subjectById(id),cfg=SUBJECT_CLASS_INFO[type];
+  if(!s||!cfg)return;
+  openModal(cfg.label,s.name,`
+    <form id="classInfoForm"><div class="form-grid">
+      <div class="field full-span"><label>Викладач · ${cfg.label}</label><input name="teacher" value="${attr(s[cfg.teacher]||"")}" placeholder="ПІБ викладача"></div>
+      <div class="field full-span"><label>Контактні дані викладача</label><textarea name="contact" rows="3" placeholder="Telegram, пошта, кабінет, телефон...">${esc(s[cfg.contact]||"")}</textarea></div>
+    </div><div class="form-actions"><button type="button" class="secondary-btn" id="cancelClassInfo">Скасувати</button><button class="primary-btn">Зберегти</button></div></form>`);
+  $("#cancelClassInfo").onclick=closeModal;
+  $("#classInfoForm").onsubmit=async e=>{
+    e.preventDefault();
+    const fd=new FormData(e.target);
+    const payload={
+      [cfg.teacher]:String(fd.get("teacher")||"").trim(),
+      [cfg.contact]:String(fd.get("contact")||"").trim(),
+      updated_at:new Date().toISOString()
+    };
+    const {error}=await db.from("subjects").update(payload).eq("id",s.id);
+    if(error)return toast(error.message);
+    await logChange("edit",`Оновлено ${cfg.label.toLowerCase()}`,s.name);
+    closeModal();await refreshAll();render();toast("Інформацію оновлено");
+  };
+}
+
 function openSubjectForm(id=null){
   if(!isAdmin())return toast("Недостатньо прав");
   const s=id?subjectById(id):null;
@@ -1056,9 +1106,13 @@ function openSubjectForm(id=null){
     <div class="field"><label>Колір</label><input type="color" name="color" value="${attr(s?.color||"#315efb")}"></div>
     <div class="field full-span"><label>Викладачі за типом заняття</label><div class="field-hint">У розкладі автоматично показуватиметься викладач саме для вибраного типу пари.</div></div>
     <div class="field"><label>Лекції</label><input name="teacher_lecture" value="${attr(s?.teacher_lecture||"")}" placeholder="ПІБ викладача"></div>
-    <div class="field"><label>Практичні</label><input name="teacher_practice" value="${attr(s?.teacher_practice||"")}" placeholder="ПІБ викладача"></div>
+    <div class="field"><label>Контакти · лекції</label><input name="teacher_contact_lecture" value="${attr(s?.teacher_contact_lecture||"")}" placeholder="Telegram, пошта..."></div>
     <div class="field"><label>Лабораторні</label><input name="teacher_lab" value="${attr(s?.teacher_lab||"")}" placeholder="ПІБ викладача"></div>
+    <div class="field"><label>Контакти · лабораторні</label><input name="teacher_contact_lab" value="${attr(s?.teacher_contact_lab||"")}" placeholder="Telegram, пошта..."></div>
     <div class="field"><label>Семінари</label><input name="teacher_seminar" value="${attr(s?.teacher_seminar||"")}" placeholder="ПІБ викладача"></div>
+    <div class="field"><label>Контакти · семінари</label><input name="teacher_contact_seminar" value="${attr(s?.teacher_contact_seminar||"")}" placeholder="Telegram, пошта..."></div>
+    <div class="field"><label>Практичні</label><input name="teacher_practice" value="${attr(s?.teacher_practice||"")}" placeholder="ПІБ викладача"></div>
+    <div class="field"><label>Контакти · практичні</label><input name="teacher_contact_practice" value="${attr(s?.teacher_contact_practice||"")}" placeholder="Telegram, пошта..."></div>
     <div class="field"><label>Викладач за замовчуванням</label><input name="teacher" value="${attr(s?.teacher||"")}" placeholder="Старі дані / резерв"></div>
     <div class="field"><label>Контактні дані викладача</label><input name="teacher_contacts" value="${attr(s?.teacher_contacts||"")}" placeholder="Telegram, пошта, кабінет..."></div>
     <div class="field full-span"><label>Силабус / підпис під назвою</label><textarea name="syllabus" rows="2" placeholder="Наприклад: Силабус: https://..."></textarea><div class="field-hint">Залиш порожнім — цей рядок на сторінці предмету не показуватиметься.</div></div>
@@ -1081,9 +1135,13 @@ function openSubjectForm(id=null){
       name:f.name.trim(),short:f.short.trim()||f.name.trim(),color:f.color,
       teacher:(f.teacher||"").trim(),
       teacher_lecture:(f.teacher_lecture||"").trim(),
+      teacher_contact_lecture:(f.teacher_contact_lecture||"").trim(),
       teacher_practice:(f.teacher_practice||"").trim(),
+      teacher_contact_practice:(f.teacher_contact_practice||"").trim(),
       teacher_lab:(f.teacher_lab||"").trim(),
+      teacher_contact_lab:(f.teacher_contact_lab||"").trim(),
       teacher_seminar:(f.teacher_seminar||"").trim(),
+      teacher_contact_seminar:(f.teacher_contact_seminar||"").trim(),
       teacher_contacts:(f.teacher_contacts||"").trim(),syllabus:(f.syllabus||"").trim(),
       schedule:f.schedule.trim(),assessment:f.assessment.trim(),minimum:Number(f.minimum||0),
       admission:f.admission.trim(),retakes:f.retakes.trim(),notes:f.notes.trim(),enabled_tabs:enabled,
