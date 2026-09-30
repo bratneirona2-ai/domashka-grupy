@@ -115,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 12 · окремі вкладки занять</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 13 · огляд без балів</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -167,8 +167,7 @@ const SUBJECT_TABS=[
   {key:"lab",label:"Лабораторні"},
   {key:"seminar",label:"Семінари"},
   {key:"practice",label:"Практичні"},
-  {key:"test",label:"Тести"},
-  {key:"score",label:"Мої бали"}
+  {key:"test",label:"Тести"}
 ];
 const DEFAULT_SUBJECT_TABS=SUBJECT_TABS.map(x=>x.key);
 const TASK_TAB_KEYS=["lecture","lab","seminar","practice","test"];
@@ -690,6 +689,7 @@ function subjectInfoCard(s,tab){
   }
   const syllabus=String(s.syllabus??"").trim();
   const assessment=String(s.assessment??"").trim();
+  const minimum=s.minimum!==null&&s.minimum!==undefined&&String(s.minimum).trim()!==""?clean(s.minimum):"—";
   return `<div class="card subject-info-card">
     <div class="card-header">
       <div><h3>Огляд предмету</h3><p>Загальна інформація</p></div>
@@ -698,6 +698,7 @@ function subjectInfoCard(s,tab){
     <div class="card-pad info-list">
       <div class="info-row"><span>Силабус</span><strong>${esc(syllabus||"—")}</strong></div>
       <div class="info-row"><span>Форма контролю</span><strong>${esc(assessment||"—")}</strong></div>
+      <div class="info-row"><span>Мінімум</span><strong>${esc(minimum)}</strong></div>
     </div>
   </div>`;
 }
@@ -705,7 +706,6 @@ function subjectInfoCard(s,tab){
 function subjectTabPanel(s,tab){
   if(tab==="overview")return subjectOverviewPanel(s);
   if(TASK_TAB_KEYS.includes(tab))return subjectTasks(s,tab);
-  if(tab==="score")return subjectScorePanel(s);
   return subjectOverviewPanel(s);
 }
 
@@ -1030,7 +1030,7 @@ function openSubjectTabs(id){
   if(!isAdmin())return toast("Недостатньо прав");
   const s=subjectById(id);if(!s)return;
   const selected=new Set(enabledTabs(s));
-  const counts={lab:tasksForSubject(id).filter(t=>t.type==="lab").length,practice:tasksForSubject(id).filter(t=>t.type==="practice").length,test:tasksForSubject(id).filter(t=>t.type==="test").length};
+  const counts=Object.fromEntries(TASK_TAB_KEYS.map(k=>[k,tasksForSubject(id).filter(t=>t.type===k).length]));
   openModal("Вкладки предмету",s.name,`<form id="subjectTabsForm"><div class="tab-config">${SUBJECT_TABS.map(t=>`<label class="tab-toggle"><input type="checkbox" name="enabled_tabs" value="${t.key}" ${selected.has(t.key)?"checked":""}><span class="tab-toggle-copy"><span>${t.label}</span>${TASK_TAB_KEYS.includes(t.key)?`<small>${counts[t.key]} ${plural(counts[t.key],"завдання","завдання","завдань")}</small>`:""}</span></label>`).join("")}</div><div class="help-box" style="margin-top:14px">Вимкнена вкладка просто ховається зі сторінки. Завдання всередині не видаляються — якщо вкладку увімкнути назад, вони знову з’являться.</div><div class="form-actions"><button type="button" class="secondary-btn" id="cancelSubjectTabs">Скасувати</button><button type="submit" class="primary-btn">Зберегти вкладки</button></div></form>`);
   $("#cancelSubjectTabs").onclick=closeModal;
   $("#subjectTabsForm").onsubmit=async e=>{
@@ -1053,6 +1053,7 @@ function openOverviewInfoForm(id){
     <form id="overviewInfoForm"><div class="form-grid">
       <div class="field full-span"><label>Силабус</label><textarea name="syllabus" rows="4" placeholder="Посилання, опис або основна інформація">${esc(s.syllabus||"")}</textarea></div>
       <div class="field full-span"><label>Форма контролю</label><input name="assessment" value="${attr(s.assessment||"")}" placeholder="Екзамен, залік, диф. залік..."></div>
+      <div class="field full-span"><label>Мінімум</label><input type="number" name="minimum" value="${Number(s.minimum??60)}"></div>
     </div><div class="form-actions"><button type="button" class="secondary-btn" id="cancelOverviewInfo">Скасувати</button><button class="primary-btn">Зберегти</button></div></form>`);
   $("#cancelOverviewInfo").onclick=closeModal;
   $("#overviewInfoForm").onsubmit=async e=>{
@@ -1061,6 +1062,7 @@ function openOverviewInfoForm(id){
     const payload={
       syllabus:String(fd.get("syllabus")||"").trim(),
       assessment:String(fd.get("assessment")||"").trim(),
+      minimum:Number(fd.get("minimum")||0),
       updated_at:new Date().toISOString()
     };
     const {error}=await db.from("subjects").update(payload).eq("id",s.id);
