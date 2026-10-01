@@ -115,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 17 · без тестів</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 18 · selection + enter save</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -193,7 +193,42 @@ const CLASS_TYPES={
 };
 
 const $=s=>document.querySelector(s);
-const $$=s=>[...document.querySelectorAll(s)];
+const $=s=>[...document.querySelectorAll(s)];
+
+let pointerStart=null;
+let suppressEditClickUntil=0;
+function bindSelectionGuard(){
+  document.addEventListener("pointerdown",e=>{
+    pointerStart={x:e.clientX,y:e.clientY};
+  },true);
+  document.addEventListener("pointerup",e=>{
+    if(!pointerStart)return;
+    const moved=Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y);
+    const selected=String(window.getSelection?.()?.toString?.()||"").trim();
+    if(moved>4 && selected) suppressEditClickUntil=Date.now()+350;
+    pointerStart=null;
+  },true);
+  document.addEventListener("click",e=>{
+    const editTrigger=e.target.closest(
+      '[data-edit-task],[data-edit-subject-card],[data-edit-schedule],[data-edit-class-info],[data-admin-task],[data-admin-subject],#editSubject,#editOverviewInfo'
+    );
+    if(editTrigger && Date.now()<suppressEditClickUntil){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  },true);
+}
+function bindModalEnterToSave(){
+  $("#modalBody").addEventListener("keydown",e=>{
+    if(e.key!=="Enter"||e.ctrlKey||e.altKey||e.metaKey)return;
+    if(e.target?.tagName==="TEXTAREA" && e.shiftKey)return;
+    const form=e.target?.closest("form");
+    if(!form)return;
+    if(e.target?.tagName==="BUTTON")return;
+    e.preventDefault();
+    form.requestSubmit();
+  });
+}
 
 window.addEventListener("DOMContentLoaded", boot);
 
@@ -252,6 +287,8 @@ async function boot(){
   }
 }
 function bindStatic(){
+  bindSelectionGuard();
+  bindModalEnterToSave();
   $("#setupForm").addEventListener("submit",async e=>{
     e.preventDefault();
     localStorage.setItem(CONFIG_KEY,JSON.stringify({url:$("#sbUrl").value.trim(),key:$("#sbKey").value.trim()}));
