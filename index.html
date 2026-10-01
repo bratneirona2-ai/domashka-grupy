@@ -115,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 19 · selection guard v2</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 20 · JS helper fixed</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -193,7 +193,7 @@ const CLASS_TYPES={
 };
 
 const $=s=>document.querySelector(s);
-const $=s=>[...document.querySelectorAll(s)];
+const $$=s=>[...document.querySelectorAll(s)];
 
 const EDIT_TRIGGER_SELECTOR='[data-edit-task],[data-edit-subject-card],[data-edit-schedule],[data-edit-class-info],[data-admin-task],[data-admin-subject],#editSubject,#editOverviewInfo';
 let pointerStart=null;
