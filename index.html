@@ -115,7 +115,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px
       </div>
 
       <div class="sidebar-footer">
-        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 18 · selection + enter save</div>
+        <div class="sync-badge" id="syncBadge">Синхронізація…</div><div class="sync-badge">build 19 · selection guard v2</div>
         <button class="secondary-btn full" id="adminBtn">⚙ Редагування</button>
         <button class="ghost-btn full" id="logoutBtn">Вийти</button>
       </div>
@@ -195,24 +195,58 @@ const CLASS_TYPES={
 const $=s=>document.querySelector(s);
 const $=s=>[...document.querySelectorAll(s)];
 
+const EDIT_TRIGGER_SELECTOR='[data-edit-task],[data-edit-subject-card],[data-edit-schedule],[data-edit-class-info],[data-admin-task],[data-admin-subject],#editSubject,#editOverviewInfo';
 let pointerStart=null;
-let suppressEditClickUntil=0;
+let lastPointerGesture={dragged:false,startedOnEdit:false,endedAt:0};
+let lastSelectionAt=0;
+
 function bindSelectionGuard(){
-  document.addEventListener("pointerdown",e=>{
-    pointerStart={x:e.clientX,y:e.clientY};
+  document.addEventListener("selectionchange",()=>{
+    const selected=String(window.getSelection?.()?.toString?.()||"").trim();
+    if(selected) lastSelectionAt=Date.now();
   },true);
+
+  document.addEventListener("pointerdown",e=>{
+    pointerStart={
+      x:e.clientX,
+      y:e.clientY,
+      startedOnEdit:!!e.target.closest?.(EDIT_TRIGGER_SELECTOR)
+    };
+    lastPointerGesture={dragged:false,startedOnEdit:pointerStart.startedOnEdit,endedAt:0};
+  },true);
+
+  document.addEventListener("pointermove",e=>{
+    if(!pointerStart)return;
+    if(Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y)>3){
+      lastPointerGesture.dragged=true;
+    }
+  },true);
+
   document.addEventListener("pointerup",e=>{
     if(!pointerStart)return;
     const moved=Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y);
-    const selected=String(window.getSelection?.()?.toString?.()||"").trim();
-    if(moved>4 && selected) suppressEditClickUntil=Date.now()+350;
+    lastPointerGesture={
+      dragged:lastPointerGesture.dragged||moved>3,
+      startedOnEdit:pointerStart.startedOnEdit,
+      endedAt:Date.now()
+    };
     pointerStart=null;
   },true);
+
   document.addEventListener("click",e=>{
-    const editTrigger=e.target.closest(
-      '[data-edit-task],[data-edit-subject-card],[data-edit-schedule],[data-edit-class-info],[data-admin-task],[data-admin-subject],#editSubject,#editOverviewInfo'
-    );
-    if(editTrigger && Date.now()<suppressEditClickUntil){
+    const editTrigger=e.target.closest?.(EDIT_TRIGGER_SELECTOR);
+    if(!editTrigger)return;
+
+    const selectedNow=String(window.getSelection?.()?.toString?.()||"").trim();
+    const currentGestureWasSelectionDrag=
+      lastPointerGesture.dragged &&
+      !lastPointerGesture.startedOnEdit &&
+      Date.now()-lastPointerGesture.endedAt<800;
+    const selectionJustChanged=
+      !lastPointerGesture.startedOnEdit &&
+      Date.now()-lastSelectionAt<800;
+
+    if(currentGestureWasSelectionDrag || selectedNow || selectionJustChanged){
       e.preventDefault();
       e.stopImmediatePropagation();
     }
